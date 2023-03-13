@@ -150,5 +150,15 @@ app.use(express.static(__dirname+'/public'));
 app.get("/",(req,res,next)=>{
     res.sendFile(__dirname + "/index.html");
 });
+function getSentiment2(text) {
+  const sentiment = new Sentiment();
+  const result = sentiment.analyze(text);
+  return result.score;
+}
+function getSentiment3(text) {
+  const sentiment = new Sentiment();
+  const result = sentiment.analyze(text);
+  return result.score;
+}
 
 module.exports = server;
