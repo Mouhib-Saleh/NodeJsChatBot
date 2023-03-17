@@ -33,7 +33,6 @@ function setDate(){
 
 
 function insertMessage() {
-  console.log(image)
     msg = $('.message-input').val();
     const message = {
         username: name,

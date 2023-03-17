@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const socketio = require('socket.io');
 const Message = require('./models/message');
 const Sentiment = require('sentiment');
 const natural = require('natural');
@@ -10,9 +9,16 @@ require('dotenv').config();
 
 const app = express();
 app.use(cors());
+const server = require('http').createServer(app);
 
+const io = require('socket.io')(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
 const intents = {
-  'weather': ['weather', 'forecast', 'temperature'],
+  'weather': ['weather','weather', 'forecast', 'temperature'],
   'news': ['news', 'headlines', 'articles'],
   'sports': ['sports', 'scores', 'games'],
   'greeting': ['hi', 'hello', 'hey'],
@@ -81,7 +87,7 @@ function getAutoResponse(text) {
   const intent = getIntent(text);
   const entity = getEntity(text);
 
-  if (sentiment > 0) {
+  if (sentiment > 2) {
     return 'That sounds great!';
   } else if (sentiment < 0) {
     return 'I am sorry to hear that.';
@@ -104,8 +110,7 @@ function getAutoResponse(text) {
 }
 
 // Initialize socket.io
-const server = require('http').createServer(app);
-const io = socketio(server);
+
 
 // Listen for new connections
 io.on('connection', (socket) => {
@@ -116,7 +121,7 @@ io.on('connection', (socket) => {
     console.log('New message:', data);
     const messageuser = new Message(data);
     messageuser.save().then(() => {
-        console.log('message saved!');
+        console.log('User message saved!');
       })
       .catch((error) => {
         console.error('Error saving message:', error);
@@ -133,7 +138,7 @@ console.log(autoResponse)
     // Save message to database
     const message = new Message(data);
     message.save().then(() => {
-        console.log('message saved!');
+        console.log('server message saved!');
       })
       .catch((error) => {
         console.error('Error saving message:', error);
